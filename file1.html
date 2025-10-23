@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kalkulator Aljabar — Lengkap</title>
+  <style>
+    :root{--bg:#eaf6ff;--card:#ffffff;--accent:#87cefa;--text:#123;--muted:#456}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:linear-gradient(180deg,var(--bg),#f7fdff);display:flex;align-items:center;justify-content:center;padding:28px}
+    .app{width:980px;max-width:96%;background:var(--card);border-radius:14px;box-shadow:0 10px 30px rgba(18,35,60,.08);overflow:hidden}
+    header{display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid rgba(18,35,60,.04)}
+    .logo{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),#bfe9ff);font-weight:700;color:#063859}
+    h1{font-size:18px;margin:0;color:var(--text)}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+    .container{display:grid;grid-template-columns:1fr 420px;gap:20px;padding:20px}
+    .card{background:linear-gradient(180deg,#fff,#fbfeff);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(8,30,55,.03)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+    textarea,input[type=text]{width:100%;box-sizing:border-box;padding:12px;border-radius:8px;border:1px solid rgba(18,35,60,.06);font-size:15px}
+    .controls,.ops{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    button.action{background:linear-gradient(180deg,var(--accent),#6fcfff);border:none;padding:10px 12px;border-radius:10px;color:#023047;font-weight:600;cursor:pointer}
+    button.secondary{background:transparent;border:1px solid rgba(2,48,71,.06);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
+    .opbtn{background:#f0fbff;border:none;border-radius:8px;padding:10px 14px;font-size:18px;color:#02415e;cursor:pointer;box-shadow:0 2px 4px rgba(2,48,71,.1)}
+    .result{margin-top:12px;padding:12px;border-radius:8px;background:#f1fbff;border:1px solid rgba(7,68,97,.03);min-height:60px;font-family:monospace;white-space:pre-wrap;color:#052a36}
+    .side{display:flex;flex-direction:column;gap:12px}
+    .small{font-size:13px;color:var(--muted)}
+    .examples{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{background:rgba(2,48,71,.04);padding:8px 10px;border-radius:999px;cursor:pointer}
+    footer{padding:12px 20px;border-top:1px solid rgba(18,35,60,.04);font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+    @media(max-width:920px){.container{grid-template-columns:1fr}.side{order:2}}
+  </style>
+</head>
+<body>
+  <div class="app" role="application">
+    <header>
+      <div class="logo">ALG</div>
+      <div>
+        <h1>Kalkulator Aljabar — Lengkap</h1>
+        <p class="lead">Evaluasi, sederhanakan, faktorkan, turunkan, dan selesaikan persamaan dengan operasi dasar.</p>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="card">
+        <label for="input">Masukkan ekspresi / persamaan</label>
+        <textarea id="input" rows="4" placeholder="Contoh: 2*x^2 + 3*x - 5  atau  x^2 - 5x + 6 = 0"></textarea>
+
+        <div class="ops">
+          <button class="opbtn" data-op="+">+</button>
+          <button class="opbtn" data-op="-">−</button>
+          <button class="opbtn" data-op="*">×</button>
+          <button class="opbtn" data-op="/">÷</button>
+          <button class="opbtn" data-op="^">xʸ</button>
+        </div>
+
+        <div class="controls">
+          <button class="action" id="evalBtn">Evaluate</button>
+          <button class="action" id="simplifyBtn">Simplify</button>
+          <button class="action" id="expandBtn">Expand</button>
+          <button class="action" id="factorBtn">Factor</button>
+          <button class="action" id="diffBtn">Derivative</button>
+          <button class="action" id="solveBtn">Solve</button>
+          <button class="secondary" id="clearBtn">Clear</button>
+        </div>
+
+        <div style="margin-top:12px">
+          <label for="subs">Substitusi (format: x=2,y=3) — opsional</label>
+          <input id="subs" type="text" placeholder="Contoh: x=2,y=3" />
+        </div>
+
+        <div class="result" id="output"></div>
+      </div>
+
+      <aside class="side">
+        <div class="card">
+          <div class="small">Contoh cepat</div>
+          <div class="examples" style="margin-top:8px">
+            <div class="chip" data-val="2*x^2+3*x-5">2*x^2+3*x-5</div>
+            <div class="chip" data-val="(x+2)*(x-3)">(x+2)*(x-3)</div>
+            <div class="chip" data-val="x^2-5x+6=0">x^2-5x+6=0</div>
+            <div class="chip" data-val="sin(x)^2 + cos(x)^2">sin(x)^2 + cos(x)^2</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="small">Petunjuk:</div>
+          <ol style="margin:8px 0 0 16px;color:var(--muted)">
+            <li>Gunakan ^ untuk pangkat (x^2).</li>
+            <li>Tombol operasi dasar bisa digunakan untuk mengetik cepat.</li>
+            <li>Untuk persamaan, sertakan tanda =.</li>
+          </ol>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      <div>Made with ❤️ — Kalkulator Aljabar Lengkap</div>
+      <div style="opacity:.8">Klik contoh untuk memuat</div>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@11.8.0/lib/browser/math.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/nerdamer/1.1.10/nerdamer.core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/nerdamer/1.1.10/Algebra.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/nerdamer/1.1.10/Calculus.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/nerdamer/1.1.10/Solve.min.js"></script>
+
+  <script>
+    const out = (txt) => document.getElementById('output').textContent = String(txt);
+    const inp = () => document.getElementById('input').value.trim();
+    const subsText = () => document.getElementById('subs').value.trim();
+
+    function parseSubs(s){
+      if(!s) return {};
+      try{
+        return s.split(',').map(p=>p.trim()).filter(Boolean).reduce((acc,kv)=>{
+          const [k,v] = kv.split('=');
+          acc[k.trim()] = Number(v) === Number(v) ? Number(v) : v.trim();
+          return acc;
+        },{});
+      }catch(e){return {}};
+    }
+
+    document.getElementById('clearBtn').onclick = ()=>{document.getElementById('input').value='';document.getElementById('subs').value='';out('');}
+    document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{document.getElementById('input').value=c.dataset.val; out('');}));
+
+    // Tambahan tombol operasi dasar
+    document.querySelectorAll('.opbtn').forEach(b=>{
+      b.onclick=()=>{
+        const t=document.getElementById('input');
+        const op=b.dataset.op;
+        const start=t.selectionStart;
+        const end=t.selectionEnd;
+        const val=t.value;
+        t.value=val.slice(0,start)+op+val.slice(end);
+        t.focus();
+        t.selectionStart=t.selectionEnd=start+op.length;
+      }
+    });
+
+    document.getElementById('evalBtn').onclick=()=>{
+      const expr=inp(); if(!expr){out('Masukkan ekspresi.');return}
+      const subs=parseSubs(subsText());
+      try{
+        if(expr.includes('=')){
+          const [L,R]=expr.split('=');
+          const diff=math.simplify(math.evaluate(`(${L})-(${R})`,subs));
+          out('Hasil (LHS-RHS) = '+diff);
+        }else{
+          const val=math.evaluate(expr,subs);
+          out(val);
+        }
+      }catch(e){out('Error: '+e.message)}
+    }
+
+    document.getElementById('simplifyBtn').onclick=()=>{
+      const expr=inp(); if(!expr){out('Masukkan ekspresi.');return}
+      try{out(nerdamer.simplify(expr).toString());}
+      catch(e){out('Tidak bisa disederhanakan: '+e.message)}
+    }
+
+    document.getElementById('expandBtn').onclick=()=>{
+      const expr=inp(); if(!expr){out('Masukkan ekspresi.');return}
+      try{out(nerdamer.expand(expr).toString());}
+      catch(e){out('Gagal expand: '+e.message)}
+    }
+
+    document.getElementById('factorBtn').onclick=()=>{
+      const expr=inp(); if(!expr){out('Masukkan ekspresi.');return}
+      try{out(nerdamer.factor(expr).toString());}
+      catch(e){out('Gagal faktorkan: '+e.message)}
+    }
+
+    document.getElementById('diffBtn').onclick=()=>{
+      const expr=inp(); if(!expr){out('Masukkan ekspresi.');return}
+      try{
+        if(expr.startsWith('diff(')){
+          const inside=expr.slice(5,-1);
+          const [f,v]=inside.split(',').map(s=>s.trim());
+          out(nerdamer.diff(f,v).toString());
+        }else out(nerdamer.diff(expr,'x').toString());
+      }catch(e){out('Gagal turunkan: '+e.message)}
+    }
+
+    document.getElementById('solveBtn').onclick=()=>{
+      const expr=inp(); if(!expr){out('Masukkan persamaan.');return}
+      try{
+        if(expr.includes('=')){
+          const [L,R]=expr.split('=');
+          const eq=`${L}-(${R})`;
+          const vars=(eq.match(/[a-zA-Z]+/g)||[]).filter(v=>v.length===1);
+          const var0=vars[0]||'x';
+          try{
+            const coeffs=JSON.parse(nerdamer(`coeffs(${eq},${var0})`).evaluate().text());
+            if(coeffs.length===3){
+              const [a,b,c]=coeffs; const D=b*b-4*a*c;
+              if(D<0) out(`Akar kompleks: ${(-b/(2*a)).toFixed(4)} ± ${(Math.sqrt(-D)/(2*a)).toFixed(4)}i`);
+              else out(`Akar: ${((-b+Math.sqrt(D))/(2*a)).toFixed(4)}, ${((-b-Math.sqrt(D))/(2*a)).toFixed(4)}`);
+              return;
+            }
+          }catch(e){}
+          const sol=nerdamer.solve(eq,var0);
+          out('Solutions: '+sol.toString());
+        }else{
+          document.getElementById('input').value=expr+'=0';
+          document.getElementById('solveBtn').click();
+        }
+      }catch(e){out('Error solve: '+e.message)}
+    }
+  </script>
+</body>
+</html>
